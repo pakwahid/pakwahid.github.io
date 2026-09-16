@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPI Matematika — Teorema Pythagoras | SMP Negeri 2 Karangbinangun</title>
+<style>
+:root{
+  --font-scale: 1.0;
+  --navy:#0f3460;
+  --blue:#1668c9;
+  --sky:#4fb0e8;
+  --teal:#0ea89a;
+  --amber:#f5a623;
+  --coral:#f2603c;
+  --paper:#fffdf7;
+  --ink:#1a2a3a;
+  --line:#c7dcee;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{
+  width:100%; height:100%; overflow:hidden;
+  font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;
+  color:var(--ink);
+}
+body{
+  background: url('bg-ruang-kelas.jpg') center/cover no-repeat fixed, #f0f9ff;
+  display:flex; align-items:center; justify-content:center;
+  height:100vh; width:100vw;
+}
+#app-wrap{
+  position:relative;
+  width:100vw; height:100vh;
+  display:flex; align-items:center; justify-content:center;
+}
+#app-wrap::before{
+  content:"";
+  position:absolute; inset:0;
+  background: rgba(240,249,255,0.82);
+  z-index:0;
+}
+#stage-16-9{
+  position:relative; z-index:1;
+  width:100vw; height:100vh;
+  max-width:calc(100vh * 16 / 9);
+  max-height:calc(100vw * 9 / 16);
+  aspect-ratio:16/9;
+  background:transparent; border:none; box-shadow:none; border-radius:0;
+  overflow:hidden;
+  font-size:calc(15px * var(--font-scale, 1.0));
+  display:flex; flex-direction:column;
+}
+/* ============ TOPBAR ============ */
+#topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: clamp(6px,1vh,10px) clamp(14px,2vw,26px);
+  flex-shrink:0;
+}
+#topbar.hidden{display:none;}
+.pill-btn{
+  display:flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  color:#fff; border:none; border-radius:999px;
+  padding: clamp(6px,1vh,9px) clamp(12px,1.6vw,18px);
+  font-weight:800; font-size:clamp(12px,1.5vh,14.5px);
+  cursor:pointer; box-shadow:0 3px 8px rgba(15,52,96,.35);
+  transition:transform .15s ease;
+}
+.pill-btn:hover{transform:translateY(-2px);}
+.pill-btn:active{transform:translateY(0);}
+.icon-ctrl{
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(40px,5.2vh,48px); height:clamp(40px,5.2vh,48px);
+  border-radius:50%; background:#fff; border:2px solid var(--line);
+  font-size:clamp(18px,2.3vh,23px); cursor:pointer;
+  box-shadow:0 2px 6px rgba(15,52,96,.15);
+  transition:transform .15s ease, background .15s ease;
+}
+.icon-ctrl:hover{transform:scale(1.08); background:#eaf5ff;}
+.ctrl-group{display:flex; align-items:center; gap:clamp(6px,1vw,10px);}
+
+/* ============ PAGES ============ */
+.page{
+  flex:1; min-height:0; display:none;
+  padding: clamp(10px,1.8vh,18px) clamp(18px,2.6vw,34px);
+  flex-direction:column;
+}
+.page.active{display:flex;}
+
+/* ============ COVER ============ */
+#page-cover{align-items:center; justify-content:space-between; text-align:center;}
+.cover-header{
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  background:rgba(255,255,255,0.75);
+  border:2px solid var(--line);
+  border-radius:999px;
+  padding:6px 22px;
+  box-shadow:0 4px 14px rgba(15,52,96,.15);
+}
+.cover-header img{
+  height:clamp(50px,6.8vh,68px); display:block;
+}
+.cover-header .school-name{
+  font-size:clamp(13px,1.7vh,16px); font-weight:800; color:var(--navy);
+  line-height:1.2; text-align:left;
+}
+.cover-header .school-sub{
+  font-size:clamp(10px,1.2vh,12px); font-weight:600; color:var(--blue);
+}
+.badge-row{display:flex; gap:8px; margin-left:14px;}
+.badge{
+  background:linear-gradient(135deg,var(--teal),#0a7d72);
+  color:#fff; font-weight:800; border-radius:999px;
+  padding:5px 12px; font-size:clamp(10px,1.2vh,12px);
+}
+.cover-middle{display:flex; flex-direction:column; align-items:center; gap:clamp(8px,1.4vh,16px);}
+.subject-tag{
+  color:var(--coral); font-weight:800; letter-spacing:.5px;
+  font-size:clamp(14px,2vh,18px);
+}
+.cover-title{
+  font-size:clamp(2.8rem,6.8vw,5.2rem);
+  font-weight:900; color:var(--navy); line-height:1.05;
+  text-shadow:
+    -4px -4px 0 #fff, 4px -4px 0 #fff, -4px 4px 0 #fff, 4px 4px 0 #fff,
+    0 10px 18px rgba(15,52,96,.25);
+}
+.cover-subtitle{
+  font-size:clamp(1.4rem,3.2vw,2.6rem);
+  font-weight:700; color:var(--blue);
+}
+#play-btn{
+  margin-top:clamp(8px,1.4vh,14px);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:none; border:none; cursor:pointer;
+}
+#play-circle{
+  width:clamp(60px,8.5vh,80px); height:clamp(60px,8.5vh,80px);
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ffd27a, var(--amber) 60%, var(--coral));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:clamp(26px,3.6vh,36px);
+  box-shadow:0 0 0 0 rgba(242,96,60,.55);
+  animation:pulseGlow 1.8s infinite;
+}
+@keyframes pulseGlow{
+  0%{box-shadow:0 0 0 0 rgba(242,96,60,.55);}
+  70%{box-shadow:0 0 0 22px rgba(242,96,60,0);}
+  100%{box-shadow:0 0 0 0 rgba(242,96,60,0);}
+}
+#play-btn .play-label{
+  font-size:clamp(24px,3.8vh,36px); font-weight:900; color:var(--navy);
+  letter-spacing:1px;
+}
+.cover-footer{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  background:rgba(255,255,255,.7); border-radius:16px;
+  padding:6px 20px; border:1px solid var(--line);
+}
+.cover-footer .teacher-line{font-size:clamp(12px,1.5vh,14px); font-weight:800; color:var(--navy);}
+.cover-footer .motto{font-size:clamp(10.5px,1.3vh,12.5px); font-weight:600; color:var(--blue); font-style:italic;}
+
+/* ============ MENU ============ */
+.page-title-bar{
+  align-self:flex-start;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+  color:#fff; font-weight:800; border-radius:999px;
+  padding: clamp(6px,1vh,9px) clamp(16px,2vw,24px);
+  font-size:clamp(16px,2.2vh,22px);
+  margin-bottom:clamp(8px,1.4vh,14px);
+  box-shadow:0 3px 10px rgba(15,52,96,.25);
+}
+.menu-grid{
+  flex:1; min-height:0;
+  display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr);
+  gap:clamp(10px,1.6vh,18px);
+}
+.menu-card{
+  background:#fff; border-radius:20px; border:1px solid var(--line);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  padding:clamp(8px,1.2vh,14px);
+  cursor:pointer; text-align:center;
+  box-shadow:0 6px 0 var(--line), 0 8px 16px rgba(15,52,96,.12);
+  transition:transform .15s ease, box-shadow .15s ease;
+  position:relative;
+}
+.menu-card:hover{transform:translateY(-4px);}
+.menu-card:active{transform:translateY(2px); box-shadow:0 2px 0 var(--line), 0 4px 10px rgba(15,52,96,.12);}
+.icon-box{
+  width:clamp(66px,9vh,88px); height:clamp(66px,9vh,88px);
+  border-radius:22px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(34px,4.8vh,46px);
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+.mc-title{font-size:clamp(15px,2vh,20px); font-weight:800; color:var(--navy);}
+.mc-desc{font-size:clamp(10.5px,1.3vh,12.5px); font-weight:600; color:#4a5a6a; line-height:1.3;}
+.menu-card.c1 .icon-box{background:linear-gradient(135deg,#ffe1b3,var(--amber));}
+.menu-card.c2 .icon-box{background:linear-gradient(135deg,#bfe3ff,var(--blue)); color:#fff;}
+.menu-card.c3 .icon-box{background:linear-gradient(135deg,#b9f3e8,var(--teal)); color:#fff;}
+.menu-card.c4 .icon-box{background:linear-gradient(135deg,#ffc9bd,var(--coral)); color:#fff;}
+.menu-card.c5 .icon-box{background:linear-gradient(135deg,#d8c9ff,#7b57e0); color:#fff;}
+.menu-card.c6 .icon-box{background:linear-gradient(135deg,#fff2a8,#e0b400);}
+
+/* ============ TUJUAN ============ */
+#page-tujuan{align-items:center;}
+.tp-card{
+  flex:1; width:100%; max-width:900px; margin:0 auto;
+  background:#fff; border-radius:24px; border:1px solid var(--line);
+  padding:clamp(16px,2.4vh,28px) clamp(24px,3vw,40px);
+  display:flex; flex-direction:column; gap:clamp(8px,1.3vh,14px);
+  box-shadow:0 10px 24px rgba(15,52,96,.12);
+  overflow:hidden;
+}
+.tp-card h2{font-size:clamp(18px,2.4vh,24px); color:var(--navy); font-weight:900;}
+.tp-list{list-style:none; display:flex; flex-direction:column; gap:clamp(6px,1.1vh,11px); flex:1; justify-content:center;}
+.tp-list li{
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:clamp(13.5px,1.65vh,16px); font-weight:600; line-height:1.45;
+}
+.tp-list .tp-ico{
+  flex-shrink:0; width:clamp(28px,3.6vh,34px); height:clamp(28px,3.6vh,34px);
+  border-radius:50%; background:linear-gradient(135deg,var(--teal),#0a7d72);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:clamp(13px,1.6vh,16px); font-weight:900;
+}
+
+/* ============ MATERI ============ */
+.materi-grid{
+  flex:1; min-height:0;
+  display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr);
+  gap:clamp(8px,1.3vh,14px);
+}
+.materi-card{
+  background:#fff; border-radius:18px; border:1px solid var(--line);
+  padding:clamp(8px,1.2vh,12px); display:flex; flex-direction:column; gap:5px;
+  box-shadow:0 4px 10px rgba(15,52,96,.1);
+  overflow:hidden;
+}
+.materi-visual{
+  height:42%; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(26px,3.6vh,36px);
+  background:linear-gradient(135deg,#eaf5ff,#d6ecff);
+  flex-shrink:0;
+}
+.materi-card h3{font-size:clamp(13.5px,1.8vh,17px); color:var(--navy); font-weight:800;}
+.materi-card p{font-size:clamp(11px,1.4vh,13.5px); font-weight:600; color:#3f4f5f; line-height:1.35; overflow:hidden;}
+
+/* ============ SIMULASI ============ */
+#page-simulasi{gap:clamp(6px,1vh,10px);}
+.sim-wrap{
+  flex:1; min-height:0; display:flex; gap:clamp(10px,1.5vw,18px);
+}
+.sim-svg-box{
+  flex:1.3; background:#fff; border-radius:18px; border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 16px rgba(15,52,96,.1);
+  padding:6px;
+}
+.sim-svg-box svg{height:clamp(260px,38vh,420px); width:100%;}
+.sim-controls{
+  flex:1; background:#fff; border-radius:18px; border:1px solid var(--line);
+  padding:clamp(10px,1.6vh,16px); display:flex; flex-direction:column; gap:clamp(8px,1.3vh,14px);
+  box-shadow:0 6px 16px rgba(15,52,96,.1); overflow:hidden;
+}
+.sim-controls h3{font-size:clamp(14px,1.9vh,18px); color:var(--navy); font-weight:900;}
+.slider-row label{font-size:clamp(12px,1.5vh,14px); font-weight:800; color:var(--blue);}
+.slider-row input[type=range]{width:100%; accent-color:var(--blue);}
+.sim-result{
+  background:linear-gradient(135deg,#eaf5ff,#d6ecff); border-radius:14px;
+  padding:clamp(8px,1.2vh,12px); text-align:center; flex:1;
+  display:flex; flex-direction:column; justify-content:center; gap:4px;
+}
+.sim-result .eq{font-size:clamp(16px,2.2vh,22px); font-weight:900; color:var(--navy);}
+.sim-result .status{font-size:clamp(11px,1.4vh,13.5px); font-weight:700; color:var(--teal);}
+
+/* ============ EVALUASI ============ */
+#page-evaluasi{gap:clamp(6px,0.9vh,10px);}
+.eval-tabs{display:flex; gap:8px;}
+.eval-tab{
+  padding:6px 16px; border-radius:999px; font-weight:800; font-size:clamp(11.5px,1.4vh,13.5px);
+  background:#eaf5ff; color:var(--navy); border:1px solid var(--line); cursor:default;
+}
+.eval-tab.on{background:linear-gradient(135deg,var(--blue),var(--navy)); color:#fff;}
+.eval-body{
+  flex:1; min-height:0; background:#fff; border-radius:18px; border:1px solid var(--line);
+  padding:clamp(12px,1.8vh,18px) clamp(16px,2.2vw,26px);
+  display:flex; flex-direction:column; gap:clamp(8px,1.3vh,14px);
+  box-shadow:0 6px 16px rgba(15,52,96,.1); overflow:hidden;
+}
+.q-prompt{font-size:clamp(14px,1.9vh,18px); font-weight:800; color:var(--navy);}
+.opt-grid{display:grid; grid-template-columns:1fr 1fr; gap:clamp(8px,1.2vh,12px); flex:1; align-content:center;}
+.opt-btn{
+  background:#f4f9ff; border:2px solid var(--line); border-radius:14px;
+  padding:clamp(10px,1.5vh,14px) clamp(14px,1.8vw,22px);
+  font-size:clamp(13.5px,1.8vh,17px); font-weight:700; text-align:left; cursor:pointer;
+  transition:transform .1s ease, background .15s ease;
+}
+.opt-btn:hover{transform:translateY(-2px); background:#e6f2ff;}
+.opt-btn.correct{background:#d6f5df; border-color:var(--teal); color:#0a6b46;}
+.opt-btn.wrong{background:#ffe0da; border-color:var(--coral); color:#a3311a;}
+.tf-grid{display:flex; gap:16px; flex:1; align-items:center; justify-content:center;}
+.tf-btn{
+  width:clamp(120px,16vw,180px); padding:clamp(14px,2vh,20px);
+  border-radius:16px; border:2px solid var(--line); background:#f4f9ff;
+  font-size:clamp(15px,2vh,20px); font-weight:900; cursor:pointer;
+}
+.tf-btn.b{color:#0a6b46;}
+.tf-btn.s{color:#a3311a;}
+.match-wrap{flex:1; display:flex; gap:40px; align-items:center; justify-content:center; position:relative;}
+.match-col{display:flex; flex-direction:column; gap:clamp(8px,1.3vh,14px);}
+.match-item{
+  background:#f4f9ff; border:2px solid var(--line); border-radius:12px;
+  padding:clamp(8px,1.2vh,12px) clamp(12px,1.6vw,18px);
+  font-size:clamp(12.5px,1.6vh,15px); font-weight:700; cursor:pointer; min-width:180px; text-align:center;
+}
+.match-item.sel{border-color:var(--amber); background:#fff3d6;}
+.match-item.done{border-color:var(--teal); background:#d6f5df; cursor:default;}
+#match-svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+.eval-nav{display:flex; justify-content:space-between; align-items:center;}
+.progress-dots{display:flex; gap:6px;}
+.progress-dots span{width:10px; height:10px; border-radius:50%; background:var(--line); display:block;}
+.progress-dots span.on{background:var(--blue);}
+.score-recap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(6px,1vh,10px); text-align:center;}
+.trophy{font-size:clamp(44px,6vh,60px); filter:drop-shadow(0 6px 8px rgba(0,0,0,.2));}
+.score-total{font-size:clamp(2.2rem,5vh,3.4rem); font-weight:900; color:var(--navy);}
+.score-detail{display:flex; gap:14px; font-size:clamp(12px,1.5vh,14.5px); font-weight:700; color:var(--blue);}
+
+/* ============ PROFIL ============ */
+#page-profil{align-items:center; justify-content:center;}
+.profil-card{
+  display:flex; align-items:center; gap:clamp(20px,3vw,40px);
+  background:#fff; border-radius:24px; border:1px solid var(--line);
+  padding:clamp(18px,2.6vh,30px) clamp(28px,3.6vw,44px);
+  box-shadow:0 10px 24px rgba(15,52,96,.12);
+  max-width:900px;
+}
+.profil-photo{
+  width:clamp(130px,18vh,175px); height:clamp(130px,18vh,175px); border-radius:50%;
+  border:5px solid; border-image:linear-gradient(135deg,var(--blue),var(--teal)) 1;
+  box-shadow:0 10px 18px rgba(15,52,96,.25);
+  object-fit:cover; flex-shrink:0;
+  object-position: center 25%;
+}
+.profil-info h2{font-size:clamp(20px,2.9vh,24px); font-weight:900; color:var(--navy);}
+.profil-info .role{font-size:clamp(13px,1.7vh,15px); font-weight:700; color:var(--blue); margin-top:2px;}
+.profil-info .school{font-size:clamp(13px,1.7vh,15px); font-weight:600; color:#4a5a6a; margin-top:2px;}
+.profil-info .quote{
+  margin-top:clamp(8px,1.4vh,14px); font-style:italic; font-weight:600;
+  font-size:clamp(12.5px,1.6vh,15px); color:#3f4f5f;
+  border-left:4px solid var(--amber); padding-left:12px;
+}
+
+/* ============ MODAL WAWASAN ============ */
+#wawasan-overlay{
+  position:absolute; inset:0; background:rgba(15,52,96,.55);
+  display:none; align-items:center; justify-content:center; z-index:50;
+}
+#wawasan-overlay.show{display:flex;}
+.wawasan-modal{
+  background:#fff; border-radius:22px; padding:clamp(18px,2.6vh,28px) clamp(22px,3vw,34px);
+  max-width:560px; width:80%; text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,.3);
+  display:flex; flex-direction:column; gap:clamp(8px,1.3vh,14px); align-items:center;
+}
+.wawasan-modal .wico{font-size:clamp(36px,5vh,48px);}
+.wawasan-modal h3{font-size:clamp(16px,2.2vh,21px); color:var(--navy); font-weight:900;}
+.wawasan-modal p{font-size:clamp(13px,1.7vh,15.5px); font-weight:600; color:#3f4f5f; line-height:1.5;}
+.wawasan-dots{display:flex; gap:6px;}
+.wawasan-dots span{width:8px; height:8px; border-radius:50%; background:var(--line);}
+.wawasan-dots span.on{background:var(--amber);}
+
+/* Back to top-left btn on subpages */
+.fab-back{
+  position:relative; align-self:flex-start;
+}
+
+@media(max-width:700px){
+  .menu-grid, .materi-grid{grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(3,1fr);}
+  .sim-wrap{flex-direction:column;}
+  .profil-card{flex-direction:column; text-align:center;}
+}
+</style>
+</head>
+<body>
+<div id="app-wrap">
+<div id="stage-16-9">
+
+  <!-- TOPBAR -->
+  <div id="topbar" class="hidden">
+    <button class="pill-btn" onclick="goPage('menu')">🏠 BERANDA</button>
+    <div class="ctrl-group">
+      <div class="icon-ctrl" title="Perkecil huruf" onclick="changeFont(-0.05)">A-</div>
+      <div class="icon-ctrl" title="Perbesar huruf" onclick="changeFont(0.05)">A+</div>
+      <div class="icon-ctrl" id="sound-toggle" title="Suara ON/OFF" onclick="toggleSound()">🔊</div>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 1: COVER ================= -->
+  <div class="page active" id="page-cover">
+    <div class="cover-header">
+      <img src="logo-sekolah.jpeg" alt="Logo Sekolah" onerror="this.style.display='none'">
+      <div>
+        <div class="school-name">SMP Negeri 2 Karangbinangun</div>
+        <div class="school-sub">Dinas Pendidikan Kabupaten Lamongan</div>
+      </div>
+      <div class="badge-row">
+        <div class="badge">Kurikulum Merdeka</div>
+        <div class="badge">Fase D</div>
+      </div>
+    </div>
+
+    <div class="cover-middle">
+      <div class="subject-tag">MATEMATIKA — FASE D KELAS VII</div>
+      <div class="cover-title">Teorema<br>Pythagoras</div>
+      <div class="cover-subtitle">Jelajahi Rahasia Segitiga Siku-siku 📐</div>
+      <button id="play-btn" onclick="playClick(); goPage('menu');">
+        <div id="play-circle">▶</div>
+        <div class="play-label">MULAI</div>
+      </button>
+    </div>
+
+    <div class="cover-footer">
+      <div class="teacher-line">👩‍🏫 Dikembangkan oleh Khoridatul Ilmiyah, S.Ag., M.Pd.</div>
+      <div class="motto">"Belajar Matematika itu Menyenangkan, Berkarakter Qur'ani, Beriman dan Bertaqwa"</div>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 2: MENU ================= -->
+  <div class="page" id="page-menu">
+    <div class="page-title-bar">📚 Menu Utama</div>
+    <div class="menu-grid">
+      <div class="menu-card c1" onclick="playClick(); goPage('tujuan')">
+        <div class="icon-box">🎯</div>
+        <div class="mc-title">Tujuan Pembelajaran</div>
+        <div class="mc-desc">Capaian & indikator kompetensi</div>
+      </div>
+      <div class="menu-card c2" onclick="playClick(); goPage('materi')">
+        <div class="icon-box">📖</div>
+        <div class="mc-title">Materi Pembelajaran</div>
+        <div class="mc-desc">Konsep kunci Teorema Pythagoras</div>
+      </div>
+      <div class="menu-card c3" onclick="playClick(); goPage('simulasi')">
+        <div class="icon-box">🕹️</div>
+        <div class="mc-title">Simulasi Interaktif</div>
+        <div class="mc-desc">Laboratorium segitiga siku-siku</div>
+      </div>
+      <div class="menu-card c4" onclick="playClick(); goPage('evaluasi')">
+        <div class="icon-box">📝</div>
+        <div class="mc-title">Evaluasi Multi-Format</div>
+        <div class="mc-desc">Uji pemahaman — 100 poin</div>
+      </div>
+      <div class="menu-card c5" onclick="playClick(); goPage('profil')">
+        <div class="icon-box">👨‍🏫</div>
+        <div class="mc-title">Profil Guru</div>
+        <div class="mc-desc">Fasilitator pembelajaran</div>
+      </div>
+      <div class="menu-card c6" onclick="playClick(); openWawasan()">
+        <div class="icon-box">💡</div>
+        <div class="mc-title">Wawasan & Fakta</div>
+        <div class="mc-desc">Fakta menarik seputar Pythagoras</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 3: TUJUAN ================= -->
+  <div class="page" id="page-tujuan">
+    <div class="page-title-bar">🎯 Tujuan Pembelajaran</div>
+    <div class="tp-card">
+      <h2>Setelah mempelajari materi ini, peserta didik mampu:</h2>
+      <ul class="tp-list">
+        <li><span class="tp-ico">1</span> Menjelaskan hubungan antara panjang sisi-sisi pada segitiga siku-siku melalui Teorema Pythagoras.</li>
+        <li><span class="tp-ico">2</span> Membuktikan kebenaran Teorema Pythagoras menggunakan luas persegi pada tiap sisi segitiga siku-siku.</li>
+        <li><span class="tp-ico">3</span> Menentukan panjang sisi miring (hipotenusa) jika dua sisi siku-siku diketahui.</li>
+        <li><span class="tp-ico">4</span> Menentukan panjang salah satu sisi siku-siku jika sisi miring dan satu sisi lain diketahui.</li>
+        <li><span class="tp-ico">5</span> Mengidentifikasi tripel Pythagoras dan menerapkannya dalam penyelesaian masalah.</li>
+        <li><span class="tp-ico">6</span> Menerapkan Teorema Pythagoras untuk menyelesaikan masalah kontekstual dalam kehidupan sehari-hari.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 4: MATERI ================= -->
+  <div class="page" id="page-materi">
+    <div class="page-title-bar">📖 Materi Inti Pembelajaran</div>
+    <div class="materi-grid">
+      <div class="materi-card">
+        <div class="materi-visual">📐</div>
+        <h3>Pengertian Teorema Pythagoras</h3>
+        <p>Pada segitiga siku-siku, kuadrat sisi miring (hipotenusa) sama dengan jumlah kuadrat dua sisi siku-sikunya.</p>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🧮</div>
+        <h3>Rumus Dasar</h3>
+        <p>Rumus Pythagoras dituliskan sebagai a² + b² = c², dengan c sebagai sisi miring dan a, b sebagai sisi siku-siku.</p>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🔢</div>
+        <h3>Tripel Pythagoras</h3>
+        <p>Contoh: 3-4-5, 6-8-10, 5-12-13. Tiga bilangan bulat yang memenuhi a² + b² = c² secara pasti.</p>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">📏</div>
+        <h3>Mencari Sisi Miring</h3>
+        <p>Jika dua sisi siku-siku a dan b diketahui, sisi miring dihitung dengan c = akar(a² + b²).</p>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">📊</div>
+        <h3>Mencari Sisi Siku-siku</h3>
+        <p>Jika sisi miring c dan satu sisi siku-siku diketahui, sisi lain dihitung dengan a = akar(c² − b²).</p>
+      </div>
+      <div class="materi-card">
+        <div class="materi-visual">🏗️</div>
+        <h3>Penerapan Sehari-hari</h3>
+        <p>Dipakai untuk menghitung tinggi tangga bersandar, jarak diagonal lapangan, hingga konstruksi bangunan.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 5: SIMULASI ================= -->
+  <div class="page" id="page-simulasi">
+    <div class="page-title-bar">🕹️ Laboratorium Segitiga Interaktif</div>
+    <div class="sim-wrap">
+      <div class="sim-svg-box">
+        <svg id="pyth-svg" viewBox="0 0 520 420"></svg>
+      </div>
+      <div class="sim-controls">
+        <h3>Atur Panjang Sisi</h3>
+        <div class="slider-row">
+          <label>Sisi Datar (a) = <span id="a-val">4</span> satuan</label>
+          <input type="range" id="a-range" min="2" max="10" value="4" step="1" oninput="updateSim()">
+        </div>
+        <div class="slider-row">
+          <label>Sisi Tegak (b) = <span id="b-val">3</span> satuan</label>
+          <input type="range" id="b-range" min="2" max="10" value="3" step="1" oninput="updateSim()">
+        </div>
+        <div class="sim-result">
+          <div class="eq" id="eq-text">4² + 3² = 5²</div>
+          <div class="status" id="status-text">✅ Terbukti: 16 + 9 = 25</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HALAMAN 6: EVALUASI ================= -->
+  <div class="page" id="page-evaluasi">
+    <div class="page-title-bar">📝 Evaluasi Multi-Format — 100 Poin</div>
+    <div class="eval-tabs" id="eval-tabs">
+      <div class="eval-tab" id="tab-A">Babak A · Pilihan Ganda</div>
+      <div class="eval-tab" id="tab-B">Babak B · Menjodohkan</div>
+      <div class="eval-tab" id="tab-C">Babak C · Benar/Salah</div>
+      <div class="eval-tab" id="tab-D">Babak D · Rekap</div>
+    </div>
+    <div class="eval-body" id="eval-body"></div>
+  </div>
+
+  <!-- ================= HALAMAN 7: PROFIL ================= -->
+  <div class="page" id="page-profil">
+    <div class="page-title-bar" style="align-self:center;">👨‍🏫 Profil Guru Pengembang</div>
+    <div class="profil-card">
+      <img class="profil-photo" src="foto-guru.jpeg" alt="Foto Guru" onerror="this.style.display='none'">
+      <div class="profil-info">
+        <h2>Khoridatul Ilmiyah, S.Ag., M.Pd.</h2>
+        <div class="role">Guru Mata Pelajaran Matematika</div>
+        <div class="school">SMP Negeri 2 Karangbinangun, Kabupaten Lamongan</div>
+        <div class="quote">"Mendidik bukan sekadar mengisi kepala, tetapi menyalakan pelita di dalam hati setiap anak."</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /stage-16-9 -->
+
+<!-- MODAL WAWASAN -->
+<div id="wawasan-overlay" onclick="if(event.target===this) closeWawasan()">
+  <div class="wawasan-modal">
+    <div class="wico" id="waw-ico">💡</div>
+    <h3 id="waw-title">Fakta Menarik</h3>
+    <p id="waw-text"></p>
+    <div class="wawasan-dots" id="waw-dots"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="pill-btn" onclick="prevWawasan()">◀ Sebelumnya</button>
+      <button class="pill-btn" onclick="nextWawasan()">Selanjutnya ▶</button>
+    </div>
+    <button class="pill-btn" style="background:linear-gradient(135deg,#f2603c,#a3311a);" onclick="closeWawasan()">Tutup</button>
+  </div>
+</div>
+
+</div><!-- /app-wrap -->
+
+<script>
+/* ============================================================
+   AUDIO — Web Audio API sintetis, 100% offline
+============================================================ */
+let audioCtx = null;
+let soundOn = true;
+function ensureCtx(){
+  if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+  if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+}
+function tone(freqStart, freqEnd, duration, type, gainPeak){
+  if(!soundOn) return;
+  ensureCtx();
+  const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freqStart, t0);
+  osc.frequency.linearRampToValueAtTime(freqEnd, t0+duration);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(gainPeak||0.18, t0+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0+duration);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0+duration+0.05);
+}
+function playClick(){ tone(450,880,0.12,'square',0.12); }
+function playCorrect(){
+  if(!soundOn) return;
+  ensureCtx();
+  [523.25,659.25,783.99].forEach((f,i)=>{
+    const t0 = audioCtx.currentTime + i*0.09;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type='triangle'; osc.frequency.setValueAtTime(f,t0);
+    gain.gain.setValueAtTime(0,t0);
+    gain.gain.linearRampToValueAtTime(0.16,t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001,t0+0.35);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(t0); osc.stop(t0+0.4);
+  });
+}
+function playWrong(){ tone(220,110,0.35,'sawtooth',0.15); }
+function toggleSound(){
+  soundOn = !soundOn;
+  document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn) playClick();
+}
+
+/* ============================================================
+   FONT SCALE
+============================================================ */
+function changeFont(delta){
+  const root = document.documentElement;
+  let cur = parseFloat(getComputedStyle(root).getPropertyValue('--font-scale')) || 1.0;
+  cur = Math.min(1.3, Math.max(0.8, cur+delta));
+  root.style.setProperty('--font-scale', cur);
+  playClick();
+}
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('topbar').classList.toggle('hidden', name==='cover');
+  if(name==='simulasi') updateSim();
+  if(name==='evaluasi') renderEval();
+}
+
+/* ============================================================
+   SIMULASI PYTHAGORAS
+============================================================ */
+function updateSim(){
+  const a = parseInt(document.getElementById('a-range').value);
+  const b = parseInt(document.getElementById('b-range').value);
+  document.getElementById('a-val').textContent = a;
+  document.getElementById('b-val').textContent = b;
+  const c = Math.sqrt(a*a+b*b);
+  const cRound = Math.round(c*100)/100;
+  document.getElementById('eq-text').textContent = a+'² + '+b+'² = '+cRound+'²';
+  const isInt = Number.isInteger(c);
+  document.getElementById('status-text').innerHTML = isInt
+    ? '✅ Tripel Pythagoras! '+(a*a)+' + '+(b*b)+' = '+(c*c)
+    : 'ℹ️ '+(a*a)+' + '+(b*b)+' = '+(a*a+b*b)+' → c = √'+(a*a+b*b)+' ≈ '+cRound;
+  drawTriangle(a,b,c);
+}
+
+function drawTriangle(a,b,c){
+  const svg = document.getElementById('pyth-svg');
+  const scale = 26;
+  const ax = a*scale, by = b*scale;
+  const originX = 0, originY = 0;
+  // triangle points: right angle at bottom-left
+  const P0 = [originX, originY];                 // right angle vertex
+  const P1 = [originX+ax, originY];               // along a (horizontal)
+  const P2 = [originX, originY-by];               // along b (vertical)
+
+  const sqA = squarePts(P0,P1, 'down');
+  const sqB = squarePts(P0,P2, 'left');
+  const sqC = squarePts(P1,P2, 'out');
+
+  // Compute bounding box of every point so the viewBox always fits, however large a/b get
+  const allPts = [P0,P1,P2,...sqA,...sqB,...sqC];
+  const xs = allPts.map(p=>p[0]), ys = allPts.map(p=>p[1]);
+  const pad = 46;
+  const minX = Math.min(...xs)-pad, maxX = Math.max(...xs)+pad;
+  const minY = Math.min(...ys)-pad, maxY = Math.max(...ys)+pad;
+  svg.setAttribute('viewBox', `${minX} ${minY} ${maxX-minX} ${maxY-minY}`);
+
+  function pillLabel(x,y,text,fill){
+    const w = 15+text.length*7.2;
+    return `<rect x="${x-w/2}" y="${y-11}" width="${w}" height="22" rx="6" fill="white" stroke="${fill}" stroke-width="1.5"/>
+      <text x="${x}" y="${y+5}" font-size="14" font-weight="800" text-anchor="middle" fill="${fill}">${text}</text>`;
+  }
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="gA" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#4fb0e8"/><stop offset="1" stop-color="#1668c9"/></linearGradient>
+      <linearGradient id="gB" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#7be0cf"/><stop offset="1" stop-color="#0ea89a"/></linearGradient>
+      <linearGradient id="gC" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffb98f"/><stop offset="1" stop-color="#f2603c"/></linearGradient>
+    </defs>
+    <polygon points="${sqA.map(p=>p.join(',')).join(' ')}" fill="url(#gA)" fill-opacity="0.55" stroke="#1668c9" stroke-width="3"/>
+    <polygon points="${sqB.map(p=>p.join(',')).join(' ')}" fill="url(#gB)" fill-opacity="0.55" stroke="#0ea89a" stroke-width="3"/>
+    <polygon points="${sqC.map(p=>p.join(',')).join(' ')}" fill="url(#gC)" fill-opacity="0.55" stroke="#f2603c" stroke-width="3">
+      <animate attributeName="fill-opacity" values="0.35;0.65;0.35" dur="2.2s" repeatCount="indefinite"/>
+    </polygon>
+    <polygon points="${P0.join(',')} ${P1.join(',')} ${P2.join(',')}" fill="#fffdf7" stroke="#0f3460" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="${P0[0]}" y="${P0[1]-16}" width="16" height="16" fill="none" stroke="#0f3460" stroke-width="2.5"/>
+    <line x1="${P1[0]}" y1="${P1[1]}" x2="${P2[0]}" y2="${P2[1]}" stroke="#0f3460" stroke-width="2" stroke-dasharray="6 5">
+      <animate attributeName="stroke-dashoffset" from="0" to="-22" dur="1.4s" repeatCount="indefinite"/>
+    </line>
+    ${pillLabel((P0[0]+P1[0])/2, P0[1]+18, 'a = '+a, '#1668c9')}
+    ${pillLabel(P0[0]-22, (P0[1]+P2[1])/2, 'b = '+b, '#0ea89a')}
+    ${pillLabel((P1[0]+P2[0])/2+14, (P1[1]+P2[1])/2-10, 'c = '+(Math.round(c*100)/100), '#f2603c')}
+    ${pillLabel(sqA[2][0], sqA[2][1]+2, 'a² = '+(a*a), '#1668c9')}
+    ${pillLabel(sqB[2][0]-6, sqB[2][1], 'b² = '+(b*b), '#0ea89a')}
+    ${pillLabel(sqC[1][0]-10, sqC[1][1]-6, 'c² = '+(Math.round(c*c*100)/100), '#f2603c')}
+  `;
+}
+function squarePts(P,Q,dir){
+  const dx = Q[0]-P[0], dy = Q[1]-P[1];
+  const len = Math.hypot(dx,dy);
+  const px = -dy/len, py = dx/len; // unit perpendicular vector
+  const sign = (dir==='left') ? -1 : 1; // 'down' and 'out' extend to the same side as computed geometry
+  const R = [P[0]+px*len*sign, P[1]+py*len*sign];
+  const S = [Q[0]+px*len*sign, Q[1]+py*len*sign];
+  return [P,Q,S,R];
+}
+
+/* ============================================================
+   EVALUASI
+============================================================ */
+const evalData = {
+  A: [
+    {q:'Pada segitiga siku-siku dengan sisi siku-siku 6 cm dan 8 cm, berapakah panjang sisi miringnya?',
+     opts:['10 cm','12 cm','14 cm','16 cm'], correct:0},
+    {q:'Manakah yang merupakan tripel Pythagoras?',
+     opts:['2, 3, 4','5, 12, 13','7, 8, 9','4, 5, 6'], correct:1},
+    {q:'Rumus Teorema Pythagoras yang benar untuk segitiga siku-siku dengan sisi miring c adalah...',
+     opts:['a + b = c','a² − b² = c²','a² + b² = c²','a × b = c'], correct:2},
+  ],
+  B: [
+    {term:'Hipotenusa', def:'Sisi miring, sisi terpanjang di depan sudut siku-siku'},
+    {term:'Sisi Siku-siku', def:'Dua sisi yang membentuk sudut 90°'},
+    {term:'Tripel Pythagoras', def:'Tiga bilangan bulat yang memenuhi a² + b² = c²'},
+    {term:'a² + b² = c²', def:'Rumus dasar Teorema Pythagoras'},
+  ],
+  C: [
+    {s:'Teorema Pythagoras hanya berlaku pada segitiga siku-siku.', correct:true},
+    {s:'Sisi miring selalu lebih pendek daripada sisi siku-siku.', correct:false},
+    {s:'3, 4, 5 adalah salah satu contoh tripel Pythagoras.', correct:true},
+  ]
+};
+let evalState = {tab:'A', aIdx:0, aAns:[null,null,null], aScore:0,
+  bPairs:[], bSel:null, bDone:[], bScore:0,
+  cIdx:0, cAns:[null,null,null], cScore:0};
+
+function renderEval(){
+  showTab(evalState.tab);
+}
+function updateTabs(){
+  ['A','B','C','D'].forEach(k=>{
+    document.getElementById('tab-'+k).classList.toggle('on', evalState.tab===k);
+  });
+}
+function showTab(tab){
+  evalState.tab = tab;
+  updateTabs();
+  const body = document.getElementById('eval-body');
+  if(tab==='A') renderA(body);
+  if(tab==='B') renderB(body);
+  if(tab==='C') renderC(body);
+  if(tab==='D') renderD(body);
+}
+
+function renderA(body){
+  const qi = evalState.aIdx;
+  const item = evalData.A[qi];
+  const answered = evalState.aAns[qi] !== null;
+  const isLast = qi===evalData.A.length-1;
+  body.innerHTML = `
+    <div class="q-prompt">Soal ${qi+1} dari 3 — ${item.q}</div>
+    <div class="opt-grid" id="a-opts"></div>
+    <div class="eval-nav">
+      <div class="progress-dots">${evalData.A.map((_,i)=>`<span class="${i<=qi?'on':''}"></span>`).join('')}</div>
+      <button class="pill-btn" id="a-next-btn" onclick="nextA()" ${answered?'':'style="opacity:.4;pointer-events:none;"'}>${isLast?'Lanjut ke Babak B ▶':'Soal Berikutnya ▶'}</button>
+    </div>`;
+  const opts = document.getElementById('a-opts');
+  item.opts.forEach((opt,oi)=>{
+    const btn = document.createElement('button');
+    btn.className='opt-btn'; btn.textContent = opt;
+    if(answered){
+      if(oi===item.correct) btn.classList.add('correct');
+      else if(oi===evalState.aAns[qi]) btn.classList.add('wrong');
+    }
+    btn.onclick = ()=>{
+      if(evalState.aAns[qi]!==null) return;
+      evalState.aAns[qi] = oi;
+      if(oi===item.correct){ evalState.aScore+=10; playCorrect(); } else { playWrong(); }
+      renderA(body);
+    };
+    opts.appendChild(btn);
+  });
+}
+function nextA(){
+  if(evalState.aAns[evalState.aIdx]===null) return;
+  playClick();
+  if(evalState.aIdx < evalData.A.length-1){ evalState.aIdx++; showTab('A'); }
+  else { showTab('B'); }
+}
+
+function renderB(body){
+  body.innerHTML = `
+    <div class="q-prompt">Jodohkan istilah dengan definisinya (klik istilah lalu definisi yang sesuai)</div>
+    <div class="match-wrap">
+      <svg id="match-svg"></svg>
+      <div class="match-col" id="match-terms"></div>
+      <div class="match-col" id="match-defs"></div>
+    </div>
+    <div class="eval-nav">
+      <div style="font-weight:800;color:var(--blue);">Skor Babak B: ${evalState.bScore} / 40</div>
+      <button class="pill-btn" onclick="playClick(); showTab('C')" ${evalState.bDone.length<4?'style="opacity:.5;pointer-events:none;"':''}>Lanjut ke Babak C ▶</button>
+    </div>`;
+  const termsCol = document.getElementById('match-terms');
+  const defsCol = document.getElementById('match-defs');
+  const shuffledDefs = evalData.B.map((d,i)=>i).sort(()=>Math.random()-0.5);
+  if(evalState.bShuffled===undefined) evalState.bShuffled = shuffledDefs;
+  evalData.B.forEach((pair,i)=>{
+    const el = document.createElement('div');
+    el.className='match-item'+(evalState.bDone.includes(i)?' done':(evalState.bSel===i?' sel':''));
+    el.textContent = pair.term;
+    el.id = 'term-'+i;
+    el.onclick = ()=>selectTerm(i);
+    termsCol.appendChild(el);
+  });
+  evalState.bShuffled.forEach(i=>{
+    const pair = evalData.B[i];
+    const el = document.createElement('div');
+    el.className='match-item'+(evalState.bDone.includes(i)?' done':'');
+    el.textContent = pair.def;
+    el.id = 'def-'+i;
+    el.onclick = ()=>selectDef(i);
+    defsCol.appendChild(el);
+  });
+  drawMatchLines();
+}
+function selectTerm(i){
+  if(evalState.bDone.includes(i)) return;
+  evalState.bSel = i; playClick(); showTab('B');
+}
+function selectDef(i){
+  if(evalState.bSel===null || evalState.bDone.includes(i)) return;
+  const sel = evalState.bSel;
+  if(sel===i){
+    evalState.bDone.push(i); evalState.bScore+=10; playCorrect();
+  } else {
+    playWrong();
+  }
+  evalState.bSel=null;
+  showTab('B');
+}
+function drawMatchLines(){
+  const svg = document.getElementById('match-svg');
+  if(!svg) return;
+  const box = svg.getBoundingClientRect();
+  let lines='';
+  evalState.bDone.forEach(i=>{
+    const t = document.getElementById('term-'+i);
+    const d = document.getElementById('def-'+i);
+    if(!t||!d) return;
+    const tb = t.getBoundingClientRect(), db = d.getBoundingClientRect();
+    const x1 = tb.right-box.left, y1 = tb.top+tb.height/2-box.top;
+    const x2 = db.left-box.left, y2 = db.top+db.height/2-box.top;
+    lines += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0ea89a" stroke-width="3" stroke-linecap="round"/>`;
+  });
+  svg.innerHTML = lines;
+}
+
+function renderC(body){
+  const qi = evalState.cIdx;
+  const item = evalData.C[qi];
+  const answered = evalState.cAns[qi] !== null;
+  const isLast = qi===evalData.C.length-1;
+  body.innerHTML = `
+    <div class="q-prompt">Pernyataan ${qi+1} dari 3 — ${item.s}</div>
+    <div class="tf-grid" id="c-opts"></div>
+    <div class="eval-nav">
+      <div class="progress-dots">${evalData.C.map((_,i)=>`<span class="${i<=qi?'on':''}"></span>`).join('')}</div>
+      <button class="pill-btn" id="c-next-btn" onclick="nextC()" ${answered?'':'style="opacity:.4;pointer-events:none;"'}>${isLast?'Lihat Rekap Skor ▶':'Berikutnya ▶'}</button>
+    </div>`;
+  const opts = document.getElementById('c-opts');
+  const btnB = document.createElement('button');
+  btnB.className='tf-btn b'; btnB.textContent='✓ BENAR';
+  const btnS = document.createElement('button');
+  btnS.className='tf-btn s'; btnS.textContent='✗ SALAH';
+  if(answered){
+    if(item.correct) btnB.style.background='#d6f5df'; else btnS.style.background='#ffe0da';
+  }
+  btnB.onclick=()=>answerC(qi,true,item,body);
+  btnS.onclick=()=>answerC(qi,false,item,body);
+  opts.appendChild(btnB); opts.appendChild(btnS);
+}
+function answerC(qi,val,item,body){
+  if(evalState.cAns[qi]!==null) return;
+  evalState.cAns[qi]=val;
+  if(val===item.correct){ evalState.cScore+=10; playCorrect(); } else { playWrong(); }
+  renderC(body);
+}
+function nextC(){
+  if(evalState.cAns[evalState.cIdx]===null) return;
+  playClick();
+  if(evalState.cIdx < evalData.C.length-1){ evalState.cIdx++; showTab('C'); }
+  else { showTab('D'); }
+}
+
+function renderD(body){
+  const total = evalState.aScore + evalState.bScore + evalState.cScore;
+  body.innerHTML = `
+    <div class="score-recap">
+      <div class="trophy">🏆</div>
+      <div class="score-total">${total} / 100</div>
+      <div class="score-detail">
+        <span>Babak A: ${evalState.aScore}/30</span>
+        <span>Babak B: ${evalState.bScore}/40</span>
+        <span>Babak C: ${evalState.cScore}/30</span>
+      </div>
+      <button class="pill-btn" onclick="resetEval()">🔄 Ulangi Evaluasi</button>
+    </div>`;
+}
+function resetEval(){
+  playClick();
+  evalState = {tab:'A', aIdx:0, aAns:[null,null,null], aScore:0,
+    bPairs:[], bSel:null, bDone:[], bScore:0, bShuffled:undefined,
+    cIdx:0, cAns:[null,null,null], cScore:0};
+  showTab('A');
+}
+
+/* ============================================================
+   WAWASAN & FAKTA MENARIK
+============================================================ */
+const wawasanFacts = [
+  {ico:'🏛️', title:'Asal-usul Nama', text:'Teorema ini dinamai dari Pythagoras, seorang filsuf dan matematikawan Yunani Kuno yang hidup sekitar abad ke-6 SM.'},
+  {ico:'🧱', title:'Sudah Dipakai Sebelumnya', text:'Bangsa Babilonia dan Mesir Kuno telah menggunakan konsep hubungan sisi segitiga siku-siku jauh sebelum Pythagoras, meski belum dituliskan sebagai teorema formal.'},
+  {ico:'🏗️', title:'Konstruksi Bangunan', text:'Tukang bangunan memakai tripel 3-4-5 dengan tali berjarak sama untuk memastikan sudut siku-siku saat mendirikan fondasi.'},
+  {ico:'🛰️', title:'Navigasi & GPS', text:'Perhitungan jarak lurus antar dua titik koordinat pada peta dan sistem GPS memanfaatkan prinsip Teorema Pythagoras.'},
+  {ico:'📺', title:'Ukuran Layar', text:'Ukuran diagonal layar TV atau laptop (misalnya 14 inci) dihitung menggunakan Teorema Pythagoras dari panjang dan lebar layar.'},
+];
+let waw = 0;
+function openWawasan(){
+  waw = 0; renderWawasan();
+  document.getElementById('wawasan-overlay').classList.add('show');
+}
+function closeWawasan(){ playClick(); document.getElementById('wawasan-overlay').classList.remove('show'); }
+function renderWawasan(){
+  const f = wawasanFacts[waw];
+  document.getElementById('waw-ico').textContent = f.ico;
+  document.getElementById('waw-title').textContent = f.title;
+  document.getElementById('waw-text').textContent = f.text;
+  document.getElementById('waw-dots').innerHTML = wawasanFacts.map((_,i)=>`<span class="${i===waw?'on':''}"></span>`).join('');
+}
+function nextWawasan(){ playClick(); waw = (waw+1)%wawasanFacts.length; renderWawasan(); }
+function prevWawasan(){ playClick(); waw = (waw-1+wawasanFacts.length)%wawasanFacts.length; renderWawasan(); }
+
+/* ============================================================
+   INIT
+============================================================ */
+updateSim();
+</script>
+</body>
+</html>
